@@ -1,12 +1,21 @@
 package beans;
 
 public class turnoBeans {
-    int dia, horarioI, horarioF;
+    int idTurno, dia, horarioI, horarioF;
 
-    public turnoBeans(int dia, int horarioI, int horarioF) {
+    public turnoBeans(int idTurno, int dia, int horarioI, int horarioF) {
+        this.idTurno = idTurno;
         this.dia = dia;
         this.horarioI = horarioI;
         this.horarioF = horarioF;
+    }
+
+    public int getIdTurno() {
+        return idTurno;
+    }
+
+    public void setIdTurno(int idTurno) {
+        this.idTurno = idTurno;
     }
 
     public int getDia() {
@@ -33,7 +42,5 @@ public class turnoBeans {
         this.horarioF = horarioF;
     }
 
-   
-    
     
 }

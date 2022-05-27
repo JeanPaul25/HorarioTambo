@@ -1,6 +1,6 @@
 package servlets;
 
-import beans.turnoBeans;
+import beans.*;
 import utils.*;
 
 import java.io.IOException;
@@ -52,23 +52,30 @@ public class servlet extends HttpServlet {
         String opc = request.getParameter("opcion");        
         System.out.println("Conexión Servlet: " + opc);
         
+        String us = null;
+        String tipo = null;
+        ArrayList<turnoBeans> lista = new ArrayList<>();   
+        
         switch (opc){
             case "login":
                 try {
-                    int usuario = Integer.parseInt(request.getParameter("fUsuario"));
+                    String usuario = request.getParameter("fUsuario");
                     String password = request.getParameter("fPassword");
                     
-                    PreparedStatement psta = conexionDB.getConexion().prepareStatement("select * from empleado where idEmpleado = ? and contraseña = ?");
-                    psta.setInt(1, usuario);
+                    sessionOK.setAttribute("id", usuario);
+                    
+                    PreparedStatement psta = conexionDB.getConexion().prepareStatement("select * from usuarios where idUsuario = ? and contraseña = ?");
+                    psta.setString(1, usuario);
                     psta.setString(2, password);                    
                     ResultSet rs = psta.executeQuery();
                                         
                     if(rs.next()){                   
-                        String us = rs.getString(2).toString() + " " + rs.getString(3).toString();
+                        us = rs.getString(5).toString() + " " + rs.getString(6).toString();
+                        tipo = rs.getString(3).toString();
                         conexionDB.getConexion().close();
 
-                        PreparedStatement psta2 = conexionDB.getConexion().prepareStatement("select * from semana where idEmpleado = ?");
-                        psta2.setInt(1, usuario);                            
+                        PreparedStatement psta2 = conexionDB.getConexion().prepareStatement("select * from semanas where idUsuario = ?");
+                        psta2.setString(1, usuario);                            
                         ResultSet rs2 = psta2.executeQuery();
 
                         while(rs2.next()){                            
@@ -78,41 +85,126 @@ public class servlet extends HttpServlet {
                             int mes = rs2.getInt(4);
                             conexionDB.getConexion().close();
 
-                            PreparedStatement psta3 = conexionDB.getConexion().prepareStatement("select * from turno where idSemana = ?");
+                            PreparedStatement psta3 = conexionDB.getConexion().prepareStatement("select * from turnos where idSemana = ?");
                             psta3.setInt(1, idSemana);
                             ResultSet rs3 = psta3.executeQuery();
 
-                            ArrayList<turnoBeans> lista = new ArrayList<>();                    
-
                             while(rs3.next()){       
-                                turnoBeans turnos = new turnoBeans(rs3.getInt(1), rs3.getInt(2), rs3.getInt(3));
-
+                                turnoBeans turnos = new turnoBeans(rs3.getInt(1), rs3.getInt(2), rs3.getInt(3), rs3.getInt(4));
                                 lista.add(turnos);
                             }
 
                             conexionDB.getConexion().close();
-
-                            request.setAttribute("lista", lista);   
-
-                            sessionOK.setAttribute("usuarioNA",us);  
-
-                            request.getRequestDispatcher("pages/dashboardEmpleado.jsp?opcion=dashEmp").forward(request, response);
+                            
+                            sessionOK.setAttribute("tipo", tipo);
+                            sessionOK.setAttribute("usuarioNA",us); 
+                            sessionOK.setAttribute("lista", lista);
+                            
+                            request.getRequestDispatcher("pages/dashboardEmpleado.jsp?opcion=dash").forward(request, response);
                         }
                     }else{
                         String msg = "Usuario o Password Incorrecto";
                         request.setAttribute("msg", msg);
                         request.getRequestDispatcher("index.jsp").forward(request, response);
                     }
-                } catch (IOException | NumberFormatException | SQLException | ServletException e) {
+                } catch (Exception e) {
                     System.out.println("Error Login: " + e);
                 }
                 break;
             case "logout":
                 HttpSession sesionOK = request.getSession();
                 sesionOK.invalidate();
-
                 request.setAttribute("msg", "Acaba de cerrar sesión");
                 request.getRequestDispatcher("index.jsp").forward(request, response);
+                break;
+            case "dashboard":  
+                request.getRequestDispatcher("pages/dashboardEmpleado.jsp?opcion=dash").forward(request, response);
+                break;
+            case "solPer":
+                String tipoP = request.getParameter("fTipo");
+                String exp = request.getParameter("fExp");
+                int idTurno = Integer.parseInt(request.getParameter("fTurno"));                
+                String usuarioP = null;
+                
+                if(sessionOK.getAttribute("usuarioNA") != null){
+                        usuarioP = sessionOK.getAttribute("id").toString();
+                    }
+                System.out.println(usuarioP + " --- " + tipoP + " --- " + exp + " --- " + idTurno);
+                try {
+                    PreparedStatement pstaPermiso = conexionDB.getConexion().prepareStatement("insert into permisos values(?,?,?,?,?)");
+                    pstaPermiso.setInt(1, 0);
+                    pstaPermiso.setString(2, usuarioP);                            
+                    pstaPermiso.setString(3, tipoP);
+                    pstaPermiso.setString(4, exp);
+                    pstaPermiso.setInt(5, idTurno);
+                    
+                    pstaPermiso.executeUpdate();  
+                    
+                    conexionDB.getConexion().close();
+                    
+                    request.getRequestDispatcher("servlet?opcion=dashboard").forward(request, response);                    
+                } catch (Exception e) {
+                    System.out.println("Error Solicitar Permiso: " + e);
+                }
+                break;
+            case "soli":
+                try {
+                    PreparedStatement pstaSoli = conexionDB.getConexion().prepareStatement("select * from permisos");
+                    ResultSet rsPermisos = pstaSoli.executeQuery();
+                    
+                    ArrayList<permisoBeans> arrayPermisos = new ArrayList<>(); 
+                    while(rsPermisos.next()){
+                        permisoBeans permisosB = new permisoBeans(rsPermisos.getInt(1),rsPermisos.getString(2),rsPermisos.getString(3),rsPermisos.getString(4),rsPermisos.getInt(5));
+                        arrayPermisos.add(permisosB);
+                    }               
+                    conexionDB.getConexion().close();         
+                     
+                    request.setAttribute("listaPermisos", arrayPermisos);
+                    request.getRequestDispatcher("pages/solicitudes.jsp?opcion=soli").forward(request, response);                    
+                } catch (Exception e) {
+                    System.out.println("Error Solicitar Permiso: " + e);
+                }
+                break; 
+            case "turno":
+                try {
+                    String usuarioName = null;
+                    PreparedStatement pstaTurnoU = conexionDB.getConexion().prepareStatement("select * from turnos where idTurno=?");
+                    pstaTurnoU.setInt(1, Integer.parseInt(request.getParameter("fTurnoT")));
+                    ResultSet rsTurnoF = pstaTurnoU.executeQuery();
+                    ArrayList<turnoBeans> arrayTurno = new ArrayList<>(); 
+                    
+                    while(rsTurnoF.next()){
+                        turnoBeans turnosT = new turnoBeans(rsTurnoF.getInt(1), rsTurnoF.getInt(2), rsTurnoF.getInt(3), rsTurnoF.getInt(4));
+                        arrayTurno.add(turnosT);
+                    }       
+                    
+                    conexionDB.getConexion().close(); 
+                    
+                    PreparedStatement pstaUsuarioT = conexionDB.getConexion().prepareStatement("select * from usuarios where idUsuario=?");
+                    System.out.println("USUARIO: " + request.getParameter("fUsuarioT"));
+                    pstaUsuarioT.setString(1, request.getParameter("fUsuarioT"));
+                    ResultSet rsUsuarioT = pstaUsuarioT.executeQuery();
+                       
+                    while(rsUsuarioT.next()){
+                        usuarioName = rsUsuarioT.getString(5) + " " + rsUsuarioT.getString(6);
+                    }                                  
+                    conexionDB.getConexion().close();
+                     
+                    request.setAttribute("opcion", "soli");
+                    request.setAttribute("operacion", "soliTurno");
+                    
+                    request.setAttribute("listaTurnos", arrayTurno);
+                    request.setAttribute("usuarioName", usuarioName);
+                    request.setAttribute("tipo", request.getParameter("fTipoT"));
+                    request.setAttribute("exp", request.getParameter("fExpT"));
+                    request.setAttribute("permiso", request.getParameter("fPermisoT"));
+                    
+                    
+                        System.out.println("Final Servlet Turno : " + request.getAttribute("opcion"));
+                    request.getRequestDispatcher("pages/solicitudes.jsp").forward(request, response);
+                } catch (Exception e) {
+                    System.out.println("Error Turno: " + e);
+                }
                 break;
         }        
     }

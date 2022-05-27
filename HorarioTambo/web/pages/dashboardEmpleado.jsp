@@ -12,7 +12,6 @@
     </head>
     <body>
         <%@include file="../templates/navbar.jsp"%>
-                
         <div class="container-fluid my-5"> 
             <table class="bg-light w-100 text-center table-bordered">
                 <thead>
@@ -34,7 +33,7 @@
                     int viernes[] = new int[16];
                     int sabado[] = new int[16];
                     
-                    ArrayList<turnoBeans> lista = (ArrayList<turnoBeans>)request.getAttribute("lista"); 
+                    ArrayList<turnoBeans> lista = (ArrayList<turnoBeans>)sessionOK.getAttribute("lista");
                     
                     for(int i = 0; i < lista.size(); i++){
                         int t=0, horaI, horaF;
@@ -201,8 +200,6 @@
                         
                 <%
                     }
-                    
-
                     %>
             </table>
         </div>
