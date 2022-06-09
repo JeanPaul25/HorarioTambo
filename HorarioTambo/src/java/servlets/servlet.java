@@ -1,6 +1,7 @@
 package servlets;
 
 import beans.*;
+import java.io.File;
 import utils.*;
 
 import java.io.IOException;
@@ -8,12 +9,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;  
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 
 @WebServlet(name = "servlet", urlPatterns = {"/servlet"})
@@ -121,22 +127,41 @@ public class servlet extends HttpServlet {
                 request.getRequestDispatcher("pages/dashboardEmpleado.jsp?opcion=dash").forward(request, response);
                 break;
             case "solPer":
-                String tipoP = request.getParameter("fTipo");
-                String exp = request.getParameter("fExp");
-                int idTurno = Integer.parseInt(request.getParameter("fTurno"));                
-                String usuarioP = null;
-                
-                if(sessionOK.getAttribute("usuarioNA") != null){
-                        usuarioP = sessionOK.getAttribute("id").toString();
-                    }
-                System.out.println(usuarioP + " --- " + tipoP + " --- " + exp + " --- " + idTurno);
                 try {
-                    PreparedStatement pstaPermiso = conexionDB.getConexion().prepareStatement("insert into permisos values(?,?,?,?,?)");
+                    FileItemFactory file_factory = new DiskFileItemFactory();
+
+                    ServletFileUpload servlet_up = new ServletFileUpload(file_factory);
+
+                    List items = servlet_up.parseRequest(request);
+
+                    ArrayList array = new ArrayList<>();
+                    String imagen = null;
+
+                    for(int i=0;i<items.size();i++){
+                        FileItem item = (FileItem) items.get(i);
+                        if (item.isFormField()){                    
+                            array.add(item.getString());   
+                        }else{                   
+                            String[] formato = item.getName().split("\\.");
+                            imagen = array.get(0).toString() + "." + formato[1];
+                            File archivo_server = new File("F:\\2022 - 1\\Curso Integrador 1\\HorarioTambo\\HorarioTambo\\web"+imagen);
+                            item.write(archivo_server);
+                        }
+                    }
+                             
+                    String usuarioP = null;
+
+                    if(sessionOK.getAttribute("usuarioNA") != null){
+                            usuarioP = sessionOK.getAttribute("id").toString();
+                    }
+                
+                    PreparedStatement pstaPermiso = conexionDB.getConexion().prepareStatement("insert into permisos values(?,?,?,?,?,?)");
                     pstaPermiso.setInt(1, 0);
                     pstaPermiso.setString(2, usuarioP);                            
-                    pstaPermiso.setString(3, tipoP);
-                    pstaPermiso.setString(4, exp);
-                    pstaPermiso.setInt(5, idTurno);
+                    pstaPermiso.setString(3, array.get(0).toString());
+                    pstaPermiso.setString(4, array.get(2).toString());
+                    pstaPermiso.setInt(5, Integer.parseInt(array.get(1).toString()));
+                    pstaPermiso.setString(6, imagen);
                     
                     pstaPermiso.executeUpdate();  
                     
@@ -154,7 +179,7 @@ public class servlet extends HttpServlet {
                     
                     ArrayList<permisoBeans> arrayPermisos = new ArrayList<>(); 
                     while(rsPermisos.next()){
-                        permisoBeans permisosB = new permisoBeans(rsPermisos.getInt(1),rsPermisos.getString(2),rsPermisos.getString(3),rsPermisos.getString(4),rsPermisos.getInt(5));
+                        permisoBeans permisosB = new permisoBeans(rsPermisos.getInt(1),rsPermisos.getString(2),rsPermisos.getString(3),rsPermisos.getString(4),rsPermisos.getInt(5),rsPermisos.getString(6));
                         arrayPermisos.add(permisosB);
                     }               
                     conexionDB.getConexion().close();         

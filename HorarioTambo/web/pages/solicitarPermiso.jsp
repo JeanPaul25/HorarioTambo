@@ -13,13 +13,19 @@
     <body>        
         <%@include file="../templates/navbar.jsp"%>
         
+        <%
+            String usuarioP = null;
+            if(sessionOK.getAttribute("usuarioNA") != null){
+                usuarioP = sessionOK.getAttribute("id").toString();
+            }
+            %>
         
         <div class="container"> 
-            <form class="form-control text-center font-weight-bold" action="../servlet">
+            <form class="form-control text-center font-weight-bold" action="../servletSolicitarPermiso" enctype="multipart/form-data" method="post">
                 <table class="table">
                     <tr>
-                        <td colspan="2"> <input id="fOpcion" name="opcion" type="hidden" value="solPer"></td>
-                    </tr>
+                        <td> <input type="hidden" name="fUsuario" value="<%=usuarioP%>"> </td>
+                    </tr>                    
                     <tr>
                         <td> Tipo </td> 
                         <td> Seleccionar Horario</td>
@@ -69,7 +75,7 @@
                     </tr>
                     <tr>
                         <td> 
-                            <button type="button" class="btn disabled"><a href=""> Pruebas </a></button>
+                            Prueba:&nbsp; <input type="file" name="fImagen"> 
                         </td>
                     </tr>
                     <tr>

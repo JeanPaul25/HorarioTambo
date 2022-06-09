@@ -6,13 +6,15 @@ public class permisoBeans {
     String tipo;
     String exp;
     int idTurno;
+    String prueba;
 
-    public permisoBeans(int idPermiso, String idUsuario, String tipo, String exp, int dia) {
+    public permisoBeans(int idPermiso, String idUsuario, String tipo, String exp, int idTurno, String prueba) {
         this.idPermiso = idPermiso;
         this.idUsuario = idUsuario;
         this.tipo = tipo;
         this.exp = exp;
-        this.idTurno = dia;
+        this.idTurno = idTurno;
+        this.prueba = prueba;
     }
 
     public int getIdPermiso() {
@@ -54,4 +56,14 @@ public class permisoBeans {
     public void setIdTurno(int idTurno) {
         this.idTurno = idTurno;
     }
+
+    public String getPrueba() {
+        return prueba;
+    }
+
+    public void setPrueba(String prueba) {
+        this.prueba = prueba;
+    }
+
+    
 }

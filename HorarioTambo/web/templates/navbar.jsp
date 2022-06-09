@@ -66,7 +66,7 @@
                     <button type="button" class="btn bgyellow"> Empleados </button>
                 </div>
                 <div class="col-4 text-center"> 
-                    <button type="button" class="btn bgyellow"> <a href="servlet?opcion=soli"> Revisar Solicitudes </a> </button>
+                    <button type="button" class="btn bgyellow"> <a href="servletRevisarPermisos"> Revisar Solicitudes </a> </button>
                 </div>
                 <div class="col-4 text-center"> 
                     <button type="button" class="btn bgyellow"> <a href="pages/solicitarPermiso.jsp?opcion=solPer"> Solicitar Permiso </a> </button>
@@ -91,7 +91,7 @@
             </div>    
         <%
                 }
-            }if(opcion.equals("solPer")){                                       //Dashboard de Solicitar Permiso
+            }if(opcion.equals("solPer")){                                       //Solicitar Permiso
             %>
             
             <div class="container-fluid justify-content-center col-2">                         
@@ -120,7 +120,7 @@
             </div>
             
         <%
-            }if(opcion.equals("soli")){                                         //Dashboard de Solicitudes
+            }if(opcion.equals("soli")){                                         //Solicitudes
             %>
           
             <div class="container-fluid justify-content-center col-2">                         
@@ -128,7 +128,7 @@
             </div>
             <div class="col-6 text-center text-light font-weight-bold"> Revisar Solicitudes </div>
             <div class="col-2 text-center"> 
-                <button type="button" class="btn bgyellow"> <a href="../servlet?opcion=dashboard">  Regresar </a> </button> 
+                <button type="button" class="btn bgyellow"> <a href="servlet?opcion=dashboard">  Regresar </a> </button> 
             </div>
             <div class="col-2">
                 <div>
@@ -139,7 +139,7 @@
                         </svg>   
                         <a class="d-flex"> <%=usuarioNA%> </a>
                     </button>
-                    <a class="btn bgyellow align-self-center " href="../servlet?opcion=logout"> 
+                    <a class="btn bgyellow align-self-center " href="servlet?opcion=logout"> 
                         <svg xmlns="http://www.w3.org/2000/svg" height="3vh" fill="purple" class="bi bi-door-closed" viewBox="0 0 16 16">
                             <path d="M3 2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v13h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V2zm1 13h8V2H4v13z"/>
                             <path d="M9 9a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"/>
