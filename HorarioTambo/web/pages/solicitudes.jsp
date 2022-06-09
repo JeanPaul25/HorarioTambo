@@ -3,7 +3,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title> Solicitudes de Permiso </title>
@@ -14,7 +14,7 @@
         <%@include file="../templates/navbar.jsp"%>
         
         <div class="container d-flex my-5"> 
-            <div class="col-2"> 
+            <div class="col-2" style="overflow: scroll; height: 75vh; overflow-x: hidden"> 
             <table> 
               
     <%!
@@ -42,7 +42,7 @@
                     <td class="py-3">
                         <form action="servletSolicitudes" method="post">                               
                             <label> Usuario: <%=permiso.getIdUsuario()%> </label>
-                            <label> Permiso: <%=ceros(permiso.getIdPermiso())%> <%=permiso.getIdPermiso()%> </label>
+                            <label> Permiso: <%=ceros(permiso.getIdPermiso())%><%=permiso.getIdPermiso()%> </label>
                             <input type="hidden" name="fPermiso" value="<%=permiso.getIdPermiso()%>">
                             <input type="hidden" name="listaPermisos" value="<%=arrayPermisos%>">
                             <input class="form-control btn btn-primary" type="submit" value="Consultar">  
@@ -98,21 +98,20 @@
             
         <div class="col-4"> 
             <table class="table tableSoli">
-                <tr>
+                <tr class="form-control">
                     <td> Empleado: </td>
                     <td> <%=permisoRevisar.getIdUsuario()%> </td>
-                </tr>
-                <tr>
+                
                     <td> Tipo: </td>
                     <td> <%=permisoRevisar.getTipo()%> </td>
                 </tr>
-                <tr>
+                <tr class="form-control">
                     <td> Explicación: </td>
-                    <td> <%=permisoRevisar.getExp()%> </td>
+                    <td colspan="3"> <%=permisoRevisar.getExp()%> </td>
                 </tr>
-                <tr>
+                <tr class="form-control-file" style="height: 75%">
                     <td> Prueba: </td>
-                    <td> <img src="Pruebas/<%=permisoRevisar.getPrueba()%>" alt="Prueba" class="img-fluid" style="height: 100%; width: auto"> </td>
+                    <td colspan="3"> <img src="Pruebas/<%=permisoRevisar.getPrueba()%>" alt="Prueba" class="img-fluid" style="height: 100%; width: auto"> </td>
                 </tr>
             </table>
         </div> 
