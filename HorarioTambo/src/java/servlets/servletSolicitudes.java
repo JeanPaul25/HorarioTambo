@@ -6,6 +6,7 @@
 package servlets;
 
 import beans.permisoBeans;
+import beans.turnoBeans;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.PreparedStatement;
@@ -52,6 +53,28 @@ public class servletSolicitudes extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        
+        try{
+            String usuarioName = null;
+            PreparedStatement pstaTurnoU = conexionDB.getConexion().prepareStatement("select * from turnos where idTurno=?");
+            pstaTurnoU.setInt(1, Integer.parseInt(request.getParameter("fTurnoT")));
+            ResultSet rsTurnoF = pstaTurnoU.executeQuery();
+            ArrayList<turnoBeans> arrayTurno = new ArrayList<>(); 
+
+            while(rsTurnoF.next()){
+                turnoBeans turnosT = new turnoBeans(rsTurnoF.getInt(1), rsTurnoF.getInt(2), rsTurnoF.getInt(3), rsTurnoF.getInt(4));
+                arrayTurno.add(turnosT);
+            }       
+
+            conexionDB.getConexion().close(); 
+
+
+            request.setAttribute("listaTurnos", arrayTurno);
+            request.getRequestDispatcher("pages/solicitudes.jsp").forward(request, response);
+        } catch (Exception e) {
+            System.out.println("Error Turno: " + e);
+        }
+        
     }
 
     /**
@@ -67,7 +90,9 @@ public class servletSolicitudes extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
         try {
-            String idPermiso = request.getParameter("fPermiso").toString();
+            String idTurno = request.getParameter("fIdTurno");
+            
+            //Consulta por el permiso
             PreparedStatement pstaSolicitud = conexionDB.getConexion().prepareStatement("select * from permisos");
             ResultSet rsPermisos = pstaSolicitud.executeQuery();
 
@@ -78,12 +103,27 @@ public class servletSolicitudes extends HttpServlet {
                 permisoBeans permiso = new permisoBeans(rsPermisos.getInt(1),rsPermisos.getString(2),rsPermisos.getString(3),rsPermisos.getString(4),rsPermisos.getInt(5),rsPermisos.getString(6));
                 arrayPermisos.add(permiso);
                 if(rsPermisos.getInt(1) == Integer.parseInt(request.getParameter("fPermiso"))){
-                    System.out.println("IGUALES: " + rsPermisos.getInt(1));
                     arrayPermisoRevisar.add(permiso);
                 }
             }               
-            conexionDB.getConexion().close();         
+            conexionDB.getConexion().close();  
+            
+            
+            //Consulta por el turno
+            System.out.println("TURNO: " + idTurno);
+            PreparedStatement pstaTurnoU = conexionDB.getConexion().prepareStatement("select * from turnos where idTurno=?");
+                pstaTurnoU.setInt(1, Integer.parseInt(request.getParameter("fIdTurno")));
+            ResultSet rsTurnoF = pstaTurnoU.executeQuery();
+            ArrayList<turnoBeans> arrayTurno = new ArrayList<>(); 
+            while(rsTurnoF.next()){
+                turnoBeans turno = new turnoBeans(rsTurnoF.getInt(1), rsTurnoF.getInt(2), rsTurnoF.getInt(3), rsTurnoF.getInt(4));
+                arrayTurno.add(turno);
+            }       
+            conexionDB.getConexion().close(); 
 
+
+            
+            request.setAttribute("listaTurnos", arrayTurno);
             request.setAttribute("permiso", arrayPermisoRevisar);
             request.setAttribute("listaPermisos", arrayPermisos);
             request.getRequestDispatcher("pages/solicitudes.jsp?opcion=soli").forward(request, response);                    

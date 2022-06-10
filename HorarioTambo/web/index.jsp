@@ -48,7 +48,7 @@
                         </tr>
                         <tr>
                             <td> 
-                                <input class="form-control btn btn-primary" type="submit" value="Ingresar">  
+                                <input class="form-control btn btn-primary button" type="submit" value="Ingresar">  
                             </td>                            
                         </tr>                        
                     </table>                    

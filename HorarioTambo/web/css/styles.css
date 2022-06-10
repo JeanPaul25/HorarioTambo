@@ -19,32 +19,7 @@ button {
 a {
   text-decoration: none; }
 
+.button {
+  background-color: #660066; }
+
 /*# sourceMappingURL=styles.css.map */
-
-.barraLateral {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    right: 0;
-    background-color: white;
-    overflow-x: hidden;
-    transition: 0.5s;
-    padding-top: 60px;    
-}
-
-.tableSoli{
-    height: 75%;
-    width: 25%;
-    position: fixed;
-    background-color: #ffff99;    
-}
-
-.tableSoli td{
-    height: 5%;
-}
-
-.tdSoliPrueba{
-    
-}

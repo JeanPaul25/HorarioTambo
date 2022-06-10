@@ -1,3 +1,4 @@
+<%@page import="beans.turnoBeans"%>
 <%@page import="beans.permisoBeans"%>
 <%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -44,6 +45,7 @@
                             <label> Usuario: <%=permiso.getIdUsuario()%> </label>
                             <label> Permiso: <%=ceros(permiso.getIdPermiso())%><%=permiso.getIdPermiso()%> </label>
                             <input type="hidden" name="fPermiso" value="<%=permiso.getIdPermiso()%>">
+                            <input type="hidden" name="fIdTurno" value="<%=permiso.getIdTurno()%>">
                             <input type="hidden" name="listaPermisos" value="<%=arrayPermisos%>">
                             <input class="form-control btn btn-primary" type="submit" value="Consultar">  
                         </form>    
@@ -54,31 +56,7 @@
         }
         %>
             </table>
-        </div>
-    
-        
-            <script> 
-            function datosPermiso(idPermiso){   
-                <%
-                    System.out.println("asdasdsdads");
-                    %>
-                window.alert("asdasdasd");
-                for (int j = 0; j < arrayPermisos.size(); j++) {
-                    permisoBeans permiso2 = arrayPermisos.get(i);
-                    if(idPermiso == permiso2.getIdPermiso()){
-                        window.alert(permiso2.getIdPermiso() + " - " + permiso2.getIdUsuario());
-                    }    
-
-
-
-                }
-                        
-                    
-                
-                window.alert(idPermiso);
-            }
-        </script>
-            
+        </div>   
             
         <%
             if(request.getAttribute("permiso") == null){
@@ -93,10 +71,9 @@
                 ArrayList<permisoBeans> arrayPermisoRevisar = (ArrayList<permisoBeans>)request.getAttribute("permiso");
                 for (int i = 0; i < arrayPermisoRevisar.size(); i++) {
                     permisoBeans permisoRevisar = arrayPermisoRevisar.get(i);
-                    System.out.println("PRUEBA: " + permisoRevisar.getPrueba());
             %>
             
-        <div class="col-4"> 
+        <div class="col-8"> 
             <table class="table tableSoli">
                 <tr class="form-control">
                     <td> Empleado: </td>
@@ -115,18 +92,75 @@
                 </tr>
             </table>
         </div> 
-        <div class="col-6"> 
+        <div class="col-2"> 
             <table>
-                <tr>
-                    <td> Turno: </td>
+                <tr>                    
                     <td> 
+                        <label> Turno </label>
+                    <%
+                        String dias[] = {"Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado"};
                         
+                        ArrayList<turnoBeans> lista = (ArrayList<turnoBeans>)request.getAttribute("listaTurnos");
+                        int dia = 0, horaI = 0, horaF = 0, h = 0;                        
                         
-                        <%=permisoRevisar.getIdTurno()%> 
-                    
-                    
-                    
-                    
+                        int horario[] = new int[16];
+                        for(int d = 0; d < lista.size(); d++){
+                            turnoBeans turnos = lista.get(i);
+                            
+                            horaI = turnos.getHorarioI();
+                            horaF = turnos.getHorarioF();
+                            dia = turnos.getDia();
+                            System.out.println("OOOOOOOOOOOOO: " + horaI + " " + horaF + " " + dia);
+                            while(horaI <= horaF){
+                                horario[h] = horaI;
+                                horaI++;
+                                h++;
+                            }
+                        }
+                        %>
+                        <div class="container-fluid my-5"> 
+                            <table class="bg-light w-100 text-center table-bordered">
+                                <thead>
+                                    <tr class="bgpurple text-light">
+                                        <th> HORA </th>
+                                        <th> <%=dias[dia]%> </th>
+                                    </tr>
+                                </thead>
+                                     
+                    <%              
+                        int horaCom = 0;
+                        for(int t=0 ; t<=15 ; t++){                            
+                        %>
+                        
+                        <tr> 
+                            <td class="font-weight-bold bgpurple text-light"> <%=t+7%> </td>
+                            
+                    <%
+                            if(horario[horaCom] == t+7){
+                                horaCom++;
+                                
+                        %>
+                        
+                            <td class="bgyellow"> </td>                        
+                        
+                    <%
+                            }else{
+                        %>
+                        
+                            <td class="bg-info">  </td>
+                        
+                    <%                        
+                        }
+                        %>
+                        
+                        </tr>
+                        
+                    <%                         
+                        }        
+                        %>                       
+                        
+                            </table>                                           
+                        </div>
                     </td>
                 </tr>
             </table>
@@ -145,9 +179,6 @@
             }
             %>
         
-            
-        
-        </div>
-        
+        </div>        
     </body>
 </html>
